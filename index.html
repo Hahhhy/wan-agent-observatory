@@ -1,7 +1,65 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Wan视频生成实验：baseline与Agent视频、九项指标、模型公开回答与真实访谈。"><title>Wan 实验对照</title><link rel="stylesheet" href="style.css?v=R071"></head>
-<body><header><a class="brand" href="#compare">WAN <span>实验对照</span></a><nav><a href="#shared">十条共享进度</a><a href="#compare">视频与指标</a><a href="#decisions">模型回答</a><a href="#interviews">AI 访谈</a></nav></header>
-<main><section id="shared"><div class="heading"><div><p class="eyebrow">TEN VIDEOS · SHARED EXPERIENCE</p><h2>十条视频如何接力？</h2></div><span id="sharedCount" class="badge"></span></div><p id="sharedSummary" class="caption"></p><div id="sharedTable" class="table-wrap"></div><p class="caption">本轮12步快速实践。不同题目的分数升降不能直接当作学习收益；实际经验条数来自已发送请求，未获取时不填零。刷新页面获取最近发布进度。</p></section><section id="compare"><div class="heading"><div><p class="eyebrow">ULTRAVICO × OPAL · WAN 2.1</p><h1>每条视频，旁边就是输入和对照结果。</h1></div><label>选择场景<select id="sample"></select></label></div><p id="prompt" class="prompt"></p><div class="toolbar"><button id="play">同时播放</button><button id="pause" class="secondary">暂停</button><button id="reset" class="secondary">从头播放</button><label><input type="checkbox" id="partner"> 加入搭档五步对照</label><label class="seek">同步进度<input type="range" id="seek" min="0" max="1000" value="0" aria-label="同步视频进度"></label></div><div id="videos" class="videos"></div><p id="compareNote" class="note"></p><details class="aggregate-scores"><summary>展开多组指标总表与 CSV 下载</summary><div class="subheading"><h2>指标对比</h2><button id="csv" class="secondary">下载对照 CSV</button></div><div class="table-wrap" id="scores"></div><p class="caption">括号内为相对本批 baseline 的变化。绿色/红色表示分数上升/下降；动态程度用蓝色，需结合任务判断。未测留空。五步与十步还存在提示、输入和版本差异。</p></details><details><summary>查看所选视频的参数轨迹与计时</summary><div id="trajectories"></div></details></section>
-<section id="decisions"><div class="heading"><div><p class="eyebrow">DECISION RECORDS</p><h2>模型实际回答了什么？</h2></div><label>视频组别<select id="decisionJob"></select></label></div><p class="caption">展示观察、公开选择理由、预期效果和耗时；这些是模型公开回答。</p><div id="decisionList"></div></section>
-<section id="interviews"><div class="heading"><div><p class="eyebrow">ASK THE DECISION MODEL</p><h2>我们问了什么，它想要什么输入？</h2></div><label>访谈记录<select id="interviewSelect"></select></label></div><p id="interviewInfo" class="caption"></p><div id="dialogue"></div></section>
-<footer><span id="recordCount"></span><p>保留正负结果和失败。原始50步实验与后续小样本预检分别标记。当前三例、单seed结果不能推断普遍收益。</p><a href="data.json" download>下载本页完整公开数据 JSON</a></footer></main><div role="status" id="status" aria-live="polite"></div><script src="data.js"></script><script src="video-details.js?v=R071"></script><script src="app.js?v=R071"></script></body></html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Wan实验留痕：旧新提示、完整AI访谈、十条共享上下文、五步与十步及各自baseline的视频与指标对照。">
+  <title>Wan 实验：视频、对照与留痕</title><link rel="stylesheet" href="style.css?v=R072">
+</head>
+<body>
+<header><a class="brand" href="#prompt">WAN <span>视频 · 对照 · 留痕</span></a><nav aria-label="实验脉络"><a href="#prompt" data-tab="prompt">1 提示与访谈</a><a href="#shared" data-tab="shared">2 十条共享</a><a href="#frequency" data-tab="frequency">3 五步与十步</a><a href="#archive" data-tab="archive">全部记录</a></nav></header>
+<main>
+<div class="page-intro"><h1>按实验问题看结果。</h1><p id="recordCount"></p></div>
+<section class="chapter" id="prompt" data-chapter="prompt">
+  <div class="chapter-title"><span class="chapter-number">01</span><div><h2>旧新提示：输入改了什么，结果变了什么？</h2><p>先看旧版实跑，再看访谈和新增输入，最后看新结果。</p></div></div>
+  <div id="versionMap" class="version-map"></div>
+  <div class="experiment-step"><div class="step-heading"><h3><span>1</span> 访谈前：旧十步版与中性十步版</h3><label>原三条场景<select id="promptScene"></select></label></div>
+    <p class="scope-note">两版都是原三题、seed 1234、50总步、每10步接入。除system外，任务字段、历史包装和输出上限也不同；下方是版本结果比较。</p>
+    <div id="promptVersionScores" class="table-wrap"></div><div class="comparison-controls"><button data-play-scope="oldVideos">同时播放</button><button class="secondary" data-pause-scope="oldVideos">暂停</button><button class="secondary" data-reset-scope="oldVideos">从头播放</button></div>
+    <div id="oldVideos" class="comparison-pair"></div>
+    <h4 class="block-label">这两版实际给Agent的输入</h4><div id="oldInputDiff" class="table-wrap"></div>
+  </div>
+  <div class="experiment-step" id="interviews"><div class="step-heading"><h3><span>2</span> 与AI访谈的完整记录</h3><button class="secondary" id="downloadInterviews">下载全部访谈JSON</button></div>
+    <p id="interviewCount" class="scope-note"></p><p class="caption">每条保留实际提问、完整发送消息、公开回答、模型、耗时、Token和失败。早期缺字段拒绝不会补成成功。</p>
+    <div class="filter-row"><label>显示<select id="interviewFilter"><option value="all">全部访谈与反馈预检</option><option value="formal">18条正式访谈</option><option value="early">初期6次尝试（含失败）</option><option value="feedback">2次成片反馈预检</option></select></label><button class="secondary" id="expandInterviews">展开全部回答</button><button class="secondary" id="collapseInterviews">收起</button></div>
+    <div id="interviewList"></div>
+  </div>
+  <div class="experiment-step"><h3><span class="step-dot">3</span> 访谈后：新增的input与提示词</h3>
+    <div id="newInputDiff" class="table-wrap"></div><div id="newMemoryFields" class="table-wrap spaced"></div>
+    <div class="evidence-note">决策时新增的是此前视频的文字经验。每条成片另抽8帧给反馈模型看，再把反思摘要传给后续决策；当前生成中的画面没有回传。VideoScore只评测、不回灌。</div>
+    <details class="system-change" open><summary>实际新增的system提示全文</summary><div id="addedSystem"></div></details>
+    <div id="fullSystems"></div>
+  </div>
+  <div class="experiment-step"><div class="step-heading"><h3><span>4</span> 访谈后的新视频与指标</h3><label>十条共享结果<select id="newEpisode"></select></label></div>
+    <p class="scope-note">这是访谈后共享版：新十题、12总步、第4／8步决策。没有同设置reset baseline，表中不填改善幅度。</p><div id="newVideo"></div>
+  </div>
+  <div class="experiment-step conclusion"><h3><span class="step-dot">5</span> 这部分得到了什么结论？</h3><div id="promptConclusion"></div></div>
+</section>
+
+<section class="chapter" id="shared" data-chapter="shared" hidden>
+  <div class="chapter-title"><span class="chapter-number">02</span><div><h2>十条视频共享上下文：接力过程与效果</h2><p>所有视频、九项分数、每段耗时、实际input与模型回答。</p></div></div>
+  <div id="sharedStats" class="stat-grid"></div><div id="sharedGallery" class="shared-gallery"></div>
+  <div class="experiment-step"><div class="step-heading"><h3>十条视频的全部指标</h3><button class="secondary" id="sharedCsv">下载指标与耗时CSV</button></div><p class="scope-note">不同题目之间仅比较实测分数；没有匹配的不共享baseline，不把先后分数差当作学习收益。</p><div id="sharedMetrics" class="table-wrap"></div></div>
+  <div class="experiment-step"><h3>每一部分用了多久？</h3><div id="sharedTimes" class="table-wrap"></div><p class="caption">Agent、观测耗时已包含在生成时间内。VideoScore栏为评测器内部计时；VBench没有独立完整计时，不用估计值冒充。其余时间包含VBench、模型加载、抽帧和调度，未知计费金额不填0。</p></div>
+  <div class="experiment-step"><div class="step-heading"><h3>逐条核对：实际input、决策与成片反思</h3><label>当前视频<select id="sharedEpisode"></select></label></div><div id="sharedDetail"></div><div id="sharedOnline"></div><div id="sharedReflection"></div></div>
+  <div class="experiment-step conclusion"><h3>共享是否work？</h3><div id="sharedConclusion"></div></div>
+</section>
+
+<section class="chapter" id="frequency" data-chapter="frequency" hidden>
+  <div class="chapter-title"><span class="chapter-number">03</span><div><h2>每5步与每10步：视频、baseline与决策差异</h2><p>两组各用自己批次的baseline算差值，直接查看每步理由和实际输入。</p></div></div>
+  <div class="filter-row"><label>原三条场景<select id="frequencyScene"></select></label><label>十步版本<select id="tenVersion"><option value="core10">上一轮中性十步版</option><option value="legacy10">早期十步探索版</option></select></label></div>
+  <div class="experiment-step"><h3>视频与各自baseline</h3><div class="comparison-controls"><button data-play-scope="frequencyVideos">同时播放两组</button><button class="secondary" data-pause-scope="frequencyVideos">暂停</button><button class="secondary" data-reset-scope="frequencyVideos">从头播放</button></div><div id="frequencyVideos" class="comparison-pair"></div></div>
+  <div class="experiment-step"><div class="step-heading"><h3>九项指标：5步、10步分别相对baseline</h3><button class="secondary" id="frequencyCsv">下载这组CSV</button></div><div id="frequencyMetrics" class="table-wrap"></div></div>
+  <div class="experiment-step"><h3>模型决策哪里不一样？</h3><div id="frequencyTrajectories" class="trace-pair"></div><div id="frequencyDifferences" class="table-wrap spaced"></div><div id="frequencyDecisions" class="decision-pair"></div></div>
+  <div class="experiment-step conclusion"><h3>这部分验证了什么？</h3><div id="frequencyConclusion"></div></div>
+</section>
+
+<section class="chapter" id="archive" data-chapter="archive" hidden>
+  <div class="chapter-title"><span class="chapter-number">+</span><div><h2>全部视频与研究留痕</h2><p>保留其余输入消融、固定下降规则、候选分支、模型与卡片实验及失败。</p></div></div>
+  <div class="experiment-step"><h3>已经观察到的局部收益与负结果</h3><div id="observedFindings"></div></div>
+  <div class="experiment-step"><div class="step-heading"><h3>43条视频记录</h3><label>选择实验<select id="archiveJob"></select></label></div><div id="archiveVideo"></div><div id="archiveCalls"></div></div>
+  <div class="experiment-step"><div class="step-heading"><h3>全部研究调用</h3><button class="secondary" id="downloadAllCalls">下载全部公开调用JSON</button></div><div class="filter-row"><label>实验类别<select id="studyFilter"></select></label><label>调用记录<select id="callSelect"></select></label></div><div id="callDetail"></div></div>
+</section>
+<footer><p>保留原始分数、视频和正负结果。“模型思考”在本页对应其已保存的公开理由、预测和反思。未测留空，不把跨版本差值当作单一因素的效果。</p><a href="data.json" download>原始展示数据JSON</a> · <a href="story.json" download>补充访谈与逐段计时JSON</a> · <a href="R072_BUILD.json" download>数据与媒体SHA留痕</a></footer>
+</main><div role="status" id="status" aria-live="polite"></div>
+<script src="data.js"></script><script src="story.js?v=R072"></script><script src="video-details.js?v=R072"></script><script src="app.js?v=R072"></script>
+</body></html>

@@ -1,4 +1,4 @@
-/* R071: summaries are derived from the actual public request, never arm labels. */
+/* R072: summaries are derived from the actual public request, never arm labels. */
 (() => {
 'use strict';
 const D=window.WAN_COMPARE,jobMap=new Map(D.jobs.map(j=>[j.id,j]));
@@ -75,7 +75,7 @@ function input(j,slot){
  const id=`input-step-${slot}`,c=calls.at(-1);
  return `<section class="side-block inline-input" data-job="${esc(j.id)}"><div class="side-title"><h3>实际给 Agent 的 input</h3><label for="${id}">查看接入步骤<select id="${id}" class="input-step">${calls.map(v=>`<option value="${esc(v.id)}"${v.id===c.id?' selected':''}>第 ${esc(v.step)} 步 · α ${esc(v.decision?.selected_alpha??'未记录')}</option>`).join('')}</select></label></div><p class="caption">以下按这次已发送请求解析；切换步骤会更新输入、数值、历史和模型回答。</p><div class="input-body">${inputBody(j,c)}</div></section>`;
 }
-function render(j,slot){return `<aside class="video-details" aria-label="${esc(j.label)}的prompt、输入与指标"><section class="side-block generation-prompt"><div class="side-title"><h3>视频生成 prompt</h3><span class="badge">seed ${esc(j.seed)} · ${j.totalSteps} 步</span></div><p lang="en">${esc(j.prompt)}</p></section>${metrics(j)}${input(j,slot)}</aside>`;}
+function render(j,slot){return `<aside class="video-details" aria-label="${esc(j.label)}的prompt、输入与指标"><section class="side-block generation-prompt"><div class="side-title"><h3>视频生成 prompt</h3><span class="badge">seed ${esc(j.seed)} · ${j.totalSteps} 步</span></div><p lang="en">${esc(j.prompt)}</p></section>${metrics(j)}<details class="full-input"><summary>实际 Agent input · 按步骤查看输入和输出原文</summary>${input(j,slot)}</details></aside>`;}
 function bind(root){root.querySelectorAll('.input-step').forEach(select=>select.addEventListener('change',()=>{const panel=select.closest('.inline-input'),j=jobMap.get(panel.dataset.job),c=callsFor(j).find(c=>c.id===select.value);panel.querySelector('.input-body').innerHTML=inputBody(j,c);}));}
 window.WAN_VIDEO_DETAILS={render,bind};
 })();
