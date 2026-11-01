@@ -1,11 +1,12 @@
 {
-  "buildId": "R065",
-  "video_records": 33,
-  "public_calls": 163,
-  "interviews": 18,
-  "real_feedback_records": 2,
-  "media_files": 42,
-  "media_bytes": 80457927,
-  "original_MP4_SHA_unchanged": true,
-  "GPU_jobs_launched_by_build": 0
+  "version": "R069-ui",
+  "video_records": 43,
+  "call_records": 193,
+  "shared_videos_imported": 10,
+  "actual_experience_counts_checked": true,
+  "GPU_API_calls_by_builder": 0,
+  "base_video_records": 33,
+  "total_video_records": 43,
+  "total_public_calls": 193,
+  "original_MP4_SHA_unchanged": true
 }

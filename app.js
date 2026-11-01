@@ -47,6 +47,7 @@ $('csv').addEventListener('click',()=>{const rows=[['scene','group','cohort','me
 if(D.shared){
  const S=D.shared;$('sharedCount').textContent=S.completed+' / '+S.total+' 已完成';
  $('sharedSummary').textContent='最近同步：'+(S.observedAt?new Date(S.observedAt).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'}):'未记录')+'（北京时间） · '+S.status+' · 失败 '+S.failed+'。新prompt要求引用相关前序经历，并核对预测。';
+ if(S.result){const r=S.result;$('sharedSummary').textContent+=' 全流程 '+secs(r.queue_wall_seconds)+'；'+r.online_decisions+'次在线决策＋'+r.video_feedback_calls+'次视觉反馈；'+r.total_tokens.toLocaleString()+' tokens。20次决策全部保持α=0.9，本轮没有不共享配对，未证明质量收益。';}
  $('sharedTable').innerHTML='<table><thead><tr><th>顺序 / 任务</th><th>状态</th><th>应携带经验</th><th>实际请求经验数</th><th>全流程耗时</th><th>查看</th></tr></thead><tbody>'+S.rows.map(r=>'<tr><td>'+r.sequence+' · '+esc(r.prompt)+'</td><td>'+esc(r.status)+'</td><td>'+r.expectedPrior+'</td><td>'+(r.actualPriorCounts?.length?r.actualPriorCounts.join(' / '):'尚未获取')+'</td><td>'+secs(r.wallSeconds)+'</td><td>'+(r.jobId?'<button class="secondary shared-open" data-job="'+esc(r.jobId)+'">视频与回答</button>':'—')+'</td></tr>').join('')+'</tbody></table>';
  document.querySelectorAll('.shared-open').forEach(b=>b.addEventListener('click',()=>{sample=jobMap.get(b.dataset.job).sampleId;$('sample').value=sample;$('partner').checked=false;defaults();renderVideos();$('compare').scrollIntoView({behavior:'smooth'});}));
 } else {$('shared').hidden=true;}
