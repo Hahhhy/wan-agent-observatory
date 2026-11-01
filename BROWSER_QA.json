@@ -1,0 +1,19 @@
+{
+  "desktop": [
+    1440,
+    1000
+  ],
+  "default_video_count": 2,
+  "default_has_ten_step": "core10-truck-I11",
+  "video_records_selected": 33,
+  "video_play_seek": true,
+  "dialogues_checked": 18,
+  "metric_rows": 9,
+  "mobile": [
+    390,
+    844
+  ],
+  "no_page_overflow": true,
+  "errors": [],
+  "status": "passed"
+}
