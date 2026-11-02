@@ -11,7 +11,7 @@ const originals=['truck','water','bicycle'],names={truck:'卡车',water:'倒水'
 const cohorts=new Map(D.cohorts.map(c=>[c.id,c.label]));
 const online=j=>D.calls.filter(c=>c.jobId===j.id&&['online','historical'].includes(c.kind)).sort((a,b)=>(a.step??0)-(b.step??0));
 const getJob=(sample,cohort,arm)=>D.jobs.find(j=>j.sampleId===sample&&j.cohort===cohort&&(!arm||j.arm===arm));
-const getBaseline=j=>['A_fixed','A_090'].includes(j.arm)?j:jobs.get(j.baselineId);
+const getBaseline=j=>(['A_fixed','A_090'].includes(j.arm)||(j.cohort==='freshprefix'&&j.arm==='alpha_0.9'))?j:jobs.get(j.baselineId);
 const body=c=>{for(const m of [...(c.request?.messages||[])].reverse())if(m.role==='user'&&typeof m.content==='string'){try{return JSON.parse(m.content);}catch{}}return {};};
 const failed=c=>/fail|error|timeout|reject|429/i.test(c.status||'');
 const usage=c=>{const u=c.usage||{};return `输入 ${u.prompt_tokens??u.input_tokens??'未知'} / 输出 ${u.completion_tokens??u.output_tokens??'未知'} tokens`;};
@@ -42,8 +42,8 @@ function question(c){
  return c.kind==='feedback'?(c.request?.messages||[]).find(m=>m.role==='system')?.content:'完整问题与事实输入保存在下方实际user消息中。';
 }
 function callContents(c){
- let answer=c.decision;if(!answer&&c.publicResponse){try{answer=JSON.parse(c.publicResponse);}catch{answer=c.publicResponse;}}
- return `<div class="call-meta">${esc(c.model||'模型未记录')} · API ${sec(c.apiSeconds)} · ${esc(usage(c))}${num(c.effectiveFromStep)?' · 第'+c.effectiveFromStep+'步起生效':''}</div>${c.error?'<p class="failure-message">'+esc(c.error)+'</p>':''}<div class="bubble question"><div class="speaker">研究者／实际提问</div><p>${esc(question(c))}</p>${c.frames?.length?'<div class="frame-strip">'+c.frames.map(f=>'<img src="'+esc(f)+'" alt="实际发送的时序帧" loading="lazy">').join('')+'</div><p class="caption">实际8帧；反馈文字进入后续经验，图像没有直接附到后续决策。</p>':''}<details class="actual-messages"><summary>完整实际input：system、user与API参数</summary>${pre(c.request)}</details></div><div class="bubble"><div class="speaker">模型公开回答／原文保留</div>${rich(answer)}<details class="original-response"><summary>公开原始回答与Token统计</summary>${pre(c.publicResponse??null)}${pre(c.usage??null)}</details></div><button class="secondary" data-download-call="${esc(c.id)}">下载这次完整公开记录</button>`;
+ let answer=c.decision;if((!answer||(typeof answer==='object'&&!Object.keys(answer).length))&&c.publicResponse){try{answer=JSON.parse(c.publicResponse);}catch{answer=c.publicResponse;}}
+ return `<div class="call-meta">${esc(c.model||'模型未记录')} · API ${sec(c.apiSeconds)}${num(c.wallSeconds)?' · 记录总用时 '+sec(c.wallSeconds):''} · ${esc(usage(c))}${num(c.effectiveFromStep)?' · 第'+c.effectiveFromStep+'步起生效':''}</div>${c.error?'<p class="failure-message">'+esc(c.error)+'</p>':''}<div class="bubble question"><div class="speaker">研究者／实际提问</div><p>${esc(question(c))}</p>${c.frames?.length?'<div class="frame-strip">'+c.frames.map(f=>'<img src="'+esc(f)+'" alt="实际发送的时序帧" loading="lazy">').join('')+'</div><p class="caption">实际8帧；反馈文字进入后续经验，图像没有直接附到后续决策。</p>':''}<details class="actual-messages"><summary>完整实际input：system、user与API参数</summary>${pre(c.request)}</details></div><div class="bubble"><div class="speaker">模型公开回答／原文保留</div>${rich(answer)}<details class="original-response"><summary>公开原始回答与Token统计</summary>${pre(c.publicResponse??null)}${pre(c.usage??null)}</details></div><button class="secondary" data-download-call="${esc(c.id)}">下载这次完整公开记录</button>`;
 }
 function callCard(c,open=false){return `<details class="call-record${failed(c)?' unsuccessful':''}" data-call="${esc(c.id)}"${open?' open':''}><summary><span class="call-title">${esc(names[c.sampleId]||c.label)} · ${esc(c.label)}${num(c.step)?' · step '+c.step:''}</span><span class="badge${failed(c)?' failed':''}">${failed(c)?esc(c.status):c.decision?.selected_alpha!=null?'α '+esc(c.decision.selected_alpha):'已返回'}</span><span class="summary-time">API ${sec(c.apiSeconds)}</span></summary><div class="call-content">${open?callContents(c):''}</div></details>`;}
 function bindCalls(root){root.querySelectorAll('.call-record').forEach(el=>el.addEventListener('toggle',()=>{if(el.open&&!el.querySelector('.call-content').innerHTML)el.querySelector('.call-content').innerHTML=callContents(callMap.get(el.dataset.call));}));}
@@ -139,4 +139,5 @@ document.addEventListener('click',async event=>{
  if(el.dataset.pauseScope)$(el.dataset.pauseScope).querySelectorAll('video').forEach(v=>v.pause());
  if(el.dataset.resetScope)$(el.dataset.resetScope).querySelectorAll('video').forEach(v=>{v.pause();v.currentTime=0;});
 });
+window.WAN_EVIDENCE_RENDERERS={resultCard,callCard,bindCalls,renderCalls,body,rich,movie,usage};
 })();

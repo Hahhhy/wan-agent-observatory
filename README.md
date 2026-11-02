@@ -1,3 +1,9 @@
+# 十小时全量实验置顶（R074）
+
+首页先展开18项核心和6条完成候选视频、所有九项分数及本批baseline差值、48次实际在线决策和57条配套研究请求。12次中性KEEP单列原文与宿主生效核对；骑车候选0/3失败明确保留。原三部分叙事继续保留。
+
+旧展示漏带的K2解析失败原始文字已从当时日志补回，原failed状态和空decision不变，不新增调用。全部原data/media的SHA不变；tenhours.json提供本轮范围、时间和补充原文。
+
 # Wan 实验：视频、对照与留痕
 
 分享：https://hahhhy.github.io/wan-agent-observatory/

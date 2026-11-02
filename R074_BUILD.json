@@ -1,0 +1,11 @@
+{
+  "version": "R074",
+  "coreVideos": 18,
+  "candidateVideos": 6,
+  "uniqueVideoContents": 11,
+  "coreOnlineDecisions": 48,
+  "neutralDecisionsChecked": 12,
+  "batchResearchRecords": 105,
+  "base_data_and_media_SHA_unchanged": true,
+  "new_GPU_or_API_calls": 0
+}

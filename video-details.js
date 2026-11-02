@@ -15,7 +15,7 @@ function payload(c){
  }
  return null;
 }
-function baseline(j){const b=['A_fixed','A_090'].includes(j.arm)?j:jobMap.get(j.baselineId);return b&&b.sampleId===j.sampleId&&b.totalSteps===j.totalSteps&&b.cohort===j.cohort?b:null;}
+function baseline(j){const b=(['A_fixed','A_090'].includes(j.arm)||(j.cohort==='freshprefix'&&j.arm==='alpha_0.9'))?j:jobMap.get(j.baselineId);return b&&b.sampleId===j.sampleId&&b.totalSteps===j.totalSteps&&b.cohort===j.cohort?b:null;}
 const row=(title,body,cls='')=>`<div class="input-row ${cls}"><dt>${title}</dt><dd>${body}</dd></div>`;
 const rawDetail=(title,v)=>`<details class="input-detail"><summary>${esc(title)}</summary>${pre(v)}</details>`;
 function metrics(j){
